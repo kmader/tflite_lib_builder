@@ -1,6 +1,6 @@
 language: generic
 
-dist: trusty
+dist: xenial
 sudo: required
 
 matrix:
@@ -11,7 +11,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['build-essential', 'python3.5', 'wget', 'unzip', 'pkg-config']
+          packages: ['build-essential', 'python', 'wget', 'unzip', 'pkg-config']
           addons:
 
 before_install:
