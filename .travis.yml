@@ -29,6 +29,7 @@ install:
 script:
 - pwd
 - cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so && cd ..
+- cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so --fat_apk_cpu=x86_64,arm64-v8a,armeabi-v7a && cd ..
 before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "kmader"
@@ -41,7 +42,7 @@ deploy:
     secure: sLu7ivD1L0ElCKwJxRVUVTa7nwe/EsuqCnHPhZtq0bs756zcLqvDSYx6+tgIIkyKluQxzdB+MVsP6ctOD05NrHgfB0JGGT0AZasecs2iviq6dQ/EK1YtSS02s1CM/I8XExBmtOhgomHsTuNm0noLc+lpo5Y9KB11GQg+7iEIf/1+dlKUd18pOTdeedH2FZ9WfXgmnhUVbzrA0U7JZvepA35i/KZ9mkpyV6ZJzTmeXCnQkh4pHsJozb9oHhVvC9aKo7gozJpOIlR1BfrPt8ov66uB0XtivNz2sH65UOFvjRutV6QO3G9L5XfAXXUub9plANIqVeO539W+8wTaSWqrtM0IxN4JBl8uF7aMJUqV5TMIKHx0WBhtG33T30gH0KE/ASH0jMHsQ9hFU/PFUk9fnQCCMuZwKzcBHPcaYK5Baxe5ctYWq3WA57x6h4Kr9TxppOCAYr4Wc5d27XJWZUeDS/kaF7gOVbdtMeE9vj0G0aKVzdfet/sacMSwERGGuxs4CAR1j+KchvXjaT7T7cMb1bhgoBZeSR8MDWO/s4UGyFCr+WXbFprdJr9ZA8Q9sWr5WKbGd9Sd/nfNJBALNbmC5swcxvvuU72e71PG0Fz6omQeuyBUdozg8V3N7L9FhK8pvA9zEUFnvFvnB3BOh4Y11jeI+c1eG32TqCGFux8izSI=
   file_glob: true
   file:
-    - tensorflow/bazel-out/darwin-opt/bin/tensorflow/lite/experimental/c/*.so
+    - tensorflow/bazel-out/*/bin/tensorflow/lite/experimental/c/*.so
   on:
     repo: kmader/tflite_lib_builder
   skip_cleanup: true
