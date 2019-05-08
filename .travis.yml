@@ -29,5 +29,5 @@ install:
 
 script:
   - pwd
-  - ./tensorflow/tensorflow/lite/tools/make/build_aarch64_lib.sh
+  # ./tensorflow/tensorflow/lite/tools/make/build_aarch64_lib.sh
   - cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so --crosstool_top=//external:android/crosstool --cpu=arm64-v8a --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --cxxopt="-std=c++11"
