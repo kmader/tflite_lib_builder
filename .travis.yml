@@ -1,33 +1,46 @@
 language: generic
-
 dist: xenial
 sudo: required
-
 matrix:
-    include:
-    - os: linux
-      compiler: gcc
-      env: ARM=7=arm64-v8a
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['build-essential', 'python', 'wget', 'unzip', 'pkg-config']
-          addons:
-
+  include:
+  - os: linux
+    compiler: gcc
+    env: ARM=7=arm64-v8a
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - build-essential
+        - python
+        - wget
+        - unzip
+        - pkg-config
+        addons:
 before_install:
-  - |
-    set -e
-    set -x
-  - wget https://github.com/bazelbuild/bazel/releases/download/0.25.1/bazel_0.25.1-linux-x86_64.deb
-  - sudo dpkg -i bazel_0.25.1-linux-x86_64.deb
-
+- |
+  set -e
+  set -x
+- wget https://github.com/bazelbuild/bazel/releases/download/0.25.1/bazel_0.25.1-linux-x86_64.deb
+- sudo dpkg -i bazel_0.25.1-linux-x86_64.deb
 install:
-  # system libs
-  - sudo apt-get install crossbuild-essential-arm64
-  # tensorflow deps
-  - ./tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
-
+- sudo apt-get install crossbuild-essential-arm64
+- "./tensorflow/tensorflow/lite/tools/make/download_dependencies.sh"
 script:
-  - pwd
-  # ./tensorflow/tensorflow/lite/tools/make/build_aarch64_lib.sh
-  - cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so --crosstool_top=//external:android/crosstool --cpu=arm64-v8a --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --cxxopt="-std=c++11"
+- pwd
+- cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so --crosstool_top=//external:android/crosstool --cpu=arm64-v8a --host_crosstool_top=@bazel_tools//tools/cpp:toolchain --cxxopt="-std=c++11" && cd ..
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name "kmader"
+  - git config --local user.email "kevinmader@gmail.com"
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: sLu7ivD1L0ElCKwJxRVUVTa7nwe/EsuqCnHPhZtq0bs756zcLqvDSYx6+tgIIkyKluQxzdB+MVsP6ctOD05NrHgfB0JGGT0AZasecs2iviq6dQ/EK1YtSS02s1CM/I8XExBmtOhgomHsTuNm0noLc+lpo5Y9KB11GQg+7iEIf/1+dlKUd18pOTdeedH2FZ9WfXgmnhUVbzrA0U7JZvepA35i/KZ9mkpyV6ZJzTmeXCnQkh4pHsJozb9oHhVvC9aKo7gozJpOIlR1BfrPt8ov66uB0XtivNz2sH65UOFvjRutV6QO3G9L5XfAXXUub9plANIqVeO539W+8wTaSWqrtM0IxN4JBl8uF7aMJUqV5TMIKHx0WBhtG33T30gH0KE/ASH0jMHsQ9hFU/PFUk9fnQCCMuZwKzcBHPcaYK5Baxe5ctYWq3WA57x6h4Kr9TxppOCAYr4Wc5d27XJWZUeDS/kaF7gOVbdtMeE9vj0G0aKVzdfet/sacMSwERGGuxs4CAR1j+KchvXjaT7T7cMb1bhgoBZeSR8MDWO/s4UGyFCr+WXbFprdJr9ZA8Q9sWr5WKbGd9Sd/nfNJBALNbmC5swcxvvuU72e71PG0Fz6omQeuyBUdozg8V3N7L9FhK8pvA9zEUFnvFvnB3BOh4Y11jeI+c1eG32TqCGFux8izSI=
+  file_glob: true
+  file: tensorflow/bazel-out/*
+  on:
+    repo: kmader/tflite_lib_builder
+  skip_cleanup: true
