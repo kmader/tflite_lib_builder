@@ -5,7 +5,7 @@ matrix:
   include:
   - os: linux
     compiler: gcc
-    env: ARM=7=arm64-v8a
+    env: PLATFORM=arm64-v8a
     addons:
       apt:
         sources:
@@ -29,7 +29,9 @@ install:
 script:
 - pwd
 - cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so && cd ..
+- cd tensorflow && bazel build //tensorflow/lite:libtensorflowlite.so && cd ..
 - cd tensorflow && bazel build //tensorflow/lite/experimental/c:libtensorflowlite_c.so --fat_apk_cpu=x86_64,arm64-v8a,armeabi-v7a && cd ..
+- ls -lh tensorflow/bazel-out/*/bin/tensorflow/lite/experimental/c/*.so
 before_deploy:
   # Set up git user name and tag this commit
   - git config --local user.name "kmader"
@@ -43,6 +45,7 @@ deploy:
   file_glob: true
   file:
     - tensorflow/bazel-out/*/bin/tensorflow/lite/experimental/c/*.so
+    - tensorflow/bazel-out/*/bin/tensorflow/lite/*.so
   on:
     repo: kmader/tflite_lib_builder
   skip_cleanup: true
